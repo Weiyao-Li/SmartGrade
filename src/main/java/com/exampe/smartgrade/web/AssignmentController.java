@@ -2,6 +2,7 @@ package com.exampe.smartgrade.web;
 
 import com.exampe.smartgrade.domain.Assignment;
 import com.exampe.smartgrade.domain.User;
+import com.exampe.smartgrade.dto.AssignmentResponseDto;
 import com.exampe.smartgrade.service.AssignmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.spel.ast.Assign;
@@ -34,7 +35,8 @@ public class AssignmentController {
     @GetMapping("{assignmentId}")
     public ResponseEntity<?> getAssignments(@PathVariable Long assignmentId, @AuthenticationPrincipal User user) {
         Optional<Assignment> assignmentOpt = assignmentService.findById(assignmentId);
-        return ResponseEntity.ok(assignmentOpt.orElse(new Assignment()));
+        AssignmentResponseDto response = new AssignmentResponseDto(assignmentOpt.orElse(new Assignment()));
+        return ResponseEntity.ok(response);
 
     }
 

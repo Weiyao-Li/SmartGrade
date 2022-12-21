@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {useLocalState} from "../util/useLocalStorage";
-import {Link, Navigate} from "react-router-dom";
 import ajax from "../Services/fetchService";
 import {Button, Card} from "react-bootstrap";
+
 
 const Dashboard = () => {
     const [jwt, setJwt] = useLocalState("", "jwt");
@@ -23,6 +23,12 @@ const Dashboard = () => {
 
     return (
         <div style={{marginTop: "2em"}}>
+
+
+            <div className="mb-5 text-center">
+                <Button variant="outline-success" size="lg" onClick={() => createAssignment()}>Submit New
+                    Assignment</Button>
+            </div>
             {assignments ? (
                 <div className="d-grid gap-5" style={{gridTemplateColumns: "repeat(auto-fit, 18rem)"}}>
                     {assignments.map(assignment => (
@@ -36,9 +42,11 @@ const Dashboard = () => {
                                     <p><b>Branch: </b>{assignment.branch}</p>
                                 </Card.Text>
 
-                                <Button onClick={() => {
-                                    window.location.href = `/assignments/${assignment.id}`;
-                                }}
+                                <Button
+                                    variant="outline-primary"
+                                    onClick={() => {
+                                        window.location.href = `/assignments/${assignment.id}`;
+                                    }}
                                 >Edit</Button>
 
                             </Card.Body>
@@ -49,7 +57,7 @@ const Dashboard = () => {
             ) : (
                 <></>
             )}
-            <button onClick={() => createAssignment()}>Submit New Assignment</button>
+
         </div>
     );
 };

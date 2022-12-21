@@ -19,7 +19,6 @@ import org.springframework.http.HttpHeaders;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-
     @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
