@@ -4,9 +4,10 @@ import ajax from "../Services/fetchService";
 import {Badge, Button, Card} from "react-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import Container from "react-bootstrap/Container";
 
 
-const Dashboard = () => {
+const CodeReviewerDashboard = () => {
     const [jwt, setJwt] = useLocalState("", "jwt");
     const [assignments, setAssignments] = useState(null);
 
@@ -24,7 +25,7 @@ const Dashboard = () => {
     }
 
     return (
-        <div style={{marginTop: "2em"}}>
+        <Container>
             <Row>
                 <Col>
                     <div
@@ -38,10 +39,11 @@ const Dashboard = () => {
                     </div>
                 </Col>
             </Row>
-            <div className="mb-5 text-center">
-                <Button variant="outline-success" size="lg" onClick={() => createAssignment()}>Submit New
-                    Assignment</Button>
-            </div>
+            <Row>
+                <Col>
+                    <div className="h1">Code Reviewer Dashboard</div>
+                </Col>
+            </Row>
             {assignments ? (
                 <div className="d-grid gap-5" style={{gridTemplateColumns: "repeat(auto-fit, 18rem)"}}>
                     {assignments.map(assignment => (
@@ -72,8 +74,8 @@ const Dashboard = () => {
                 <></>
             )}
 
-        </div>
+        </Container>
     );
 };
 
-export default Dashboard;
+export default CodeReviewerDashboard;

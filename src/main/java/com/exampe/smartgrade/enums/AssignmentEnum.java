@@ -2,7 +2,7 @@ package com.exampe.smartgrade.enums;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-//@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum AssignmentEnum {
     ASSIGNMENT_1(1, "HTML Assignment"),
     ASSIGNMENT_2(2, "Guessing Game"),
