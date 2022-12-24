@@ -3,6 +3,7 @@ package com.exampe.smartgrade.service;
 import com.exampe.smartgrade.domain.Assignment;
 import com.exampe.smartgrade.domain.User;
 import com.exampe.smartgrade.enums.AssignmentStatusEnum;
+import com.exampe.smartgrade.enums.AuthorityEnum;
 import com.exampe.smartgrade.repository.AssignmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,13 @@ public class AssignmentService {
     }
 
     public Set<Assignment> findByUser (User user) {
+        boolean hasCodeReviewerRole = user.getAuthorities()
+                .stream().
+                filter(auth -> AuthorityEnum.ROLE_INSTRUCTOR.name().equals(auth.getAuthority()))
+                .count() > 0;
+        if (hasCodeReviewerRole) {
+            return assignmentRepo.findByCodeReviewer(user);
+        }
         return assignmentRepo.findByUser(user);
     }
 

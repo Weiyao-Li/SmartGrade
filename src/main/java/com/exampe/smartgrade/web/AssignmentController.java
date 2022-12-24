@@ -3,7 +3,10 @@ package com.exampe.smartgrade.web;
 import com.exampe.smartgrade.domain.Assignment;
 import com.exampe.smartgrade.domain.User;
 import com.exampe.smartgrade.dto.AssignmentResponseDto;
+import com.exampe.smartgrade.enums.AuthorityEnum;
 import com.exampe.smartgrade.service.AssignmentService;
+import com.exampe.smartgrade.service.UserService;
+import com.exampe.smartgrade.util.AuthorityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.spel.ast.Assign;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,8 @@ import java.util.Set;
 public class AssignmentController {
     @Autowired
     private AssignmentService assignmentService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("")
     public ResponseEntity<?> createAssignment (@AuthenticationPrincipal User user) {
@@ -27,6 +32,7 @@ public class AssignmentController {
 
     @GetMapping("")
     public ResponseEntity<?> getAssignments(@AuthenticationPrincipal User user) {
+
         Set<Assignment> assignmentsbyUser = assignmentService.findByUser(user);
         return ResponseEntity.ok(assignmentsbyUser);
 
@@ -44,6 +50,14 @@ public class AssignmentController {
     public ResponseEntity<?> updateAssignments(@PathVariable Long assignmentId,
                                                @RequestBody Assignment assignment,
                                                @AuthenticationPrincipal User user) {
+        if (assignment.getCodeReviewer() != null) {
+            User codeReviewer = assignment.getCodeReviewer();
+            codeReviewer = userService.findUserByUsername(codeReviewer.getUsername()).orElse(new User());
+
+            if (AuthorityUtil.hasRole(AuthorityEnum.ROLE_INSTRUCTOR.name(), codeReviewer)) {
+                assignment.setCodeReviewer(codeReviewer);
+            }
+        }
         Assignment updatedAssignment = assignmentService.save(assignment);
         return ResponseEntity.ok(updatedAssignment);
     }
