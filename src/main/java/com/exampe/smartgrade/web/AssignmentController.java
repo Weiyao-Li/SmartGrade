@@ -8,7 +8,6 @@ import com.exampe.smartgrade.service.AssignmentService;
 import com.exampe.smartgrade.service.UserService;
 import com.exampe.smartgrade.util.AuthorityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.spel.ast.Assign;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
