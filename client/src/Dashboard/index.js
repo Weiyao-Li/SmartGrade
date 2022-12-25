@@ -50,7 +50,8 @@ const Dashboard = () => {
                             <Card.Body className="d-flex flex-column justify-content-around">
                                 <Card.Title>Assignment #{assignment.number}</Card.Title>
                                 <div className="d-flex align-items-start">
-                                    <Badge pill bg="info" style={{fontSize: "1em"}}>{assignment.status}</Badge></div>
+                                    <Badge pill bg={assignment.status === "Completed" ? "success" : "info"}
+                                           style={{fontSize: "1em"}}>{assignment.status}</Badge></div>
                                 <Card.Text style={{marginTop: '1em'}}>
                                     <p><b>Github URL:</b> {assignment.githubUrl}</p>
                                     <p><b>Branch: </b>{assignment.branch}</p>
