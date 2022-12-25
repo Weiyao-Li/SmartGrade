@@ -6,6 +6,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import jwt_decode from "jwt-decode";
+import StatusBadge from "../StatusBadge";
 
 const CodeReviewerDashboard = () => {
     const [jwt, setJwt] = useLocalState("", "jwt");
@@ -71,7 +72,7 @@ const CodeReviewerDashboard = () => {
                                     <Card.Body className="d-flex flex-column justify-content-around">
                                         <Card.Title>Assignment #{assignment.number}</Card.Title>
                                         <div className="d-flex align-items-start">
-                                            <Badge pill bg="info" style={{fontSize: "1em"}}>{assignment.status}</Badge>
+                                            <StatusBadge text={assignment.status}/>
                                         </div>
                                         <Card.Text style={{marginTop: '1em'}}>
                                             <p><b>Github URL:</b> {assignment.githubUrl}</p>
@@ -107,7 +108,7 @@ const CodeReviewerDashboard = () => {
                                 <Card.Body className="d-flex flex-column justify-content-around">
                                     <Card.Title>Assignment #{assignment.number}</Card.Title>
                                     <div className="d-flex align-items-start">
-                                        <Badge pill bg="info" style={{fontSize: "1em"}}>{assignment.status}</Badge>
+                                        <StatusBadge text={assignment.status}/>
                                     </div>
                                     <Card.Text style={{marginTop: '1em'}}>
                                         <p><b>Github URL:</b> {assignment.githubUrl}</p>
@@ -142,7 +143,7 @@ const CodeReviewerDashboard = () => {
                                 <Card.Body className="d-flex flex-column justify-content-around">
                                     <Card.Title>Assignment #{assignment.number}</Card.Title>
                                     <div className="d-flex align-items-start">
-                                        <Badge pill bg="info" style={{fontSize: "1em"}}>{assignment.status}</Badge>
+                                        <StatusBadge text={assignment.status}/>
                                     </div>
                                     <Card.Text style={{marginTop: '1em'}}>
                                         <p><b>Github URL:</b> {assignment.githubUrl}</p>

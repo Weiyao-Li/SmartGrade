@@ -4,6 +4,7 @@ import ajax from "../Services/fetchService";
 import {Badge, Button, Card} from "react-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import StatusBadge from "../StatusBadge";
 
 
 const Dashboard = () => {
@@ -50,8 +51,8 @@ const Dashboard = () => {
                             <Card.Body className="d-flex flex-column justify-content-around">
                                 <Card.Title>Assignment #{assignment.number}</Card.Title>
                                 <div className="d-flex align-items-start">
-                                    <Badge pill bg={assignment.status === "Completed" ? "success" : "info"}
-                                           style={{fontSize: "1em"}}>{assignment.status}</Badge></div>
+                                    <StatusBadge text={assignment.status}/>
+                                </div>
                                 <Card.Text style={{marginTop: '1em'}}>
                                     <p><b>Github URL:</b> {assignment.githubUrl}</p>
                                     <p><b>Branch: </b>{assignment.branch}</p>

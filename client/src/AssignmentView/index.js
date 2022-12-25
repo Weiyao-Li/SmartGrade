@@ -10,6 +10,7 @@ import Container from "react-bootstrap/Container";
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
+import StatusBadge from "../StatusBadge";
 
 const AssignmentView = () => {
     const [jwt, setJwt] = useLocalState("", "jwt")
@@ -79,7 +80,7 @@ const AssignmentView = () => {
                     )}
                 </Col>
                 <Col>
-                    <Badge pill bg="danger" style={{fontSize: "1em"}}>{assignment.status}</Badge>
+                    <StatusBadge text={assignment.status}/>
                 </Col>
             </Row>
             {assignment ? (<>
