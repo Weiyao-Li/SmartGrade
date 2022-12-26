@@ -11,8 +11,10 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import StatusBadge from "../StatusBadge";
+import {useNavigate} from "react-router-dom";
 
 const CodeReviewerAssignmentView = () => {
+    const navigate = useNavigate();
     const [jwt, setJwt] = useLocalState("", "jwt")
     const assignmentId = window.location.href.split("/assignments/")[1];
     const [assignment, setAssignment] = useState({
@@ -152,7 +154,7 @@ const CodeReviewerAssignmentView = () => {
                                 onClick={() => save(assignmentStatuses[3].status)}>
                             Reject Assignment
                         </Button>)}
-                    <Button size="lg" variant="secondary" onClick={() => window.location.href = "/dashboard"}>
+                    <Button size="lg" variant="secondary" onClick={() => navigate("/dashboard")}>
                         Back</Button>
                 </div>
             </>) : (<></>)}

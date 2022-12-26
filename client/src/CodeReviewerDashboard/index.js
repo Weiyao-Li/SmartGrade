@@ -7,10 +7,17 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import jwt_decode from "jwt-decode";
 import StatusBadge from "../StatusBadge";
+import {useNavigate} from "react-router-dom";
+import {useUser} from "../UserProvider";
 
 const CodeReviewerDashboard = () => {
-    const [jwt, setJwt] = useLocalState("", "jwt");
+    const navigate = useNavigate();
+    const user = useUser();
     const [assignments, setAssignments] = useState(null);
+
+    useEffect(() => {
+        if (!user.jwt) navigate("/login");
+    });
 
     function editReview(assignment) {
         window.location.href = `/assignments/${assignment.id}`;
@@ -18,15 +25,13 @@ const CodeReviewerDashboard = () => {
     }
 
     function claimAssignment(assignment) {
-        const decodedJwt = jwt_decode(jwt);
+        const decodedJwt = jwt_decode(user.jwt);
         const user = {
             username: decodedJwt.sub,
-            authorities: decodedJwt.authorities
-
         }
         assignment.codeReviewer = user;
         assignment.status = "In Review";
-        ajax(`/api/assignments/${assignment.id}`, "PUT", jwt, assignment).then(updatedAssignment => {
+        ajax(`/api/assignments/${assignment.id}`, "PUT", user.jwt, assignment).then(updatedAssignment => {
             const assignmentsCopy = [...assignments];
             const i = assignmentsCopy.findIndex((a) => a.id === assignment.id);
             assignmentsCopy[i] = updatedAssignment;
@@ -37,10 +42,10 @@ const CodeReviewerDashboard = () => {
 
 
     useEffect(() => {
-        ajax("api/assignments", "GET", jwt).then(assignmentsData => {
+        ajax("api/assignments", "GET", user.jwt).then(assignmentsData => {
             setAssignments(assignmentsData);
         })
-    }, [jwt]);
+    }, [user.jwt]);
 
     return (
         <Container>
@@ -50,8 +55,7 @@ const CodeReviewerDashboard = () => {
                         className="d-flex justify-content-end"
                         style={{cursor: "pointer"}}
                         onClick={() => {
-                            setJwt(null);
-                            window.location.href = "/login";
+                            user.setJwt(null);
                         }}>
                         Logout
                     </div>
@@ -100,32 +104,40 @@ const CodeReviewerDashboard = () => {
             <div className="assignment-wrapper submitted">
                 <div className="assignment-wrapper-title h3 px-2">Awaiting Review</div>
 
-                {assignments && assignments.filter(assignment => assignment.status === "Submitted").length > 0 ? (
+                {assignments && assignments.filter(assignment => assignment.status === "Submitted" || assignment.status === "Resubmitted"
+                ).length > 0 ? (
                     <div className="d-grid gap-5" style={{gridTemplateColumns: "repeat(auto-fit, 18rem)"}}>
-                        {assignments.filter(assignment => assignment.status === "Submitted").map(assignment => (
-                            <Card key={assignment.id}
-                                  style={{width: '18rem', height: '18rem'}}>
-                                <Card.Body className="d-flex flex-column justify-content-around">
-                                    <Card.Title>Assignment #{assignment.number}</Card.Title>
-                                    <div className="d-flex align-items-start">
-                                        <StatusBadge text={assignment.status}/>
-                                    </div>
-                                    <Card.Text style={{marginTop: '1em'}}>
-                                        <p><b>Github URL:</b> {assignment.githubUrl}</p>
-                                        <p><b>Branch: </b>{assignment.branch}</p>
-                                    </Card.Text>
+                        {assignments
+                            .sort(
+                                (a, b) => {
+                                    if (a.status === "Resubmitted") return -1;
+                                    else return 1;
+                                }
+                            )
 
-                                    <Button
-                                        variant="outline-primary"
-                                        onClick={() => {
-                                            claimAssignment(assignment);
-                                        }}
-                                    >Claim</Button>
+                            .filter(assignment => assignment.status === "Submitted" || assignment.status === "Resubmitted").map(assignment => (
+                                <Card key={assignment.id}
+                                      style={{width: '18rem', height: '18rem'}}>
+                                    <Card.Body className="d-flex flex-column justify-content-around">
+                                        <Card.Title>Assignment #{assignment.number}</Card.Title>
+                                        <div className="d-flex align-items-start">
+                                            <StatusBadge text={assignment.status}/>
+                                        </div>
+                                        <Card.Text style={{marginTop: '1em'}}>
+                                            <p><b>Github URL:</b> {assignment.githubUrl}</p>
+                                            <p><b>Branch: </b>{assignment.branch}</p>
+                                        </Card.Text>
 
-                                </Card.Body>
-                            </Card>
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => {
+                                                claimAssignment(assignment);
+                                            }}
+                                        >Claim</Button>
+                                    </Card.Body>
+                                </Card>
 
-                        ))}
+                            ))}
                     </div>
                 ) : (
                     <div>No Assignments Found</div>
@@ -153,7 +165,7 @@ const CodeReviewerDashboard = () => {
                                     <Button
                                         variant="outline-primary"
                                         onClick={() => {
-                                            window.location.href = `/assignments/${assignment.id}`
+                                            window.location.href = `/assignments/${assignment.id}`;
                                         }}
                                     >View</Button>
 

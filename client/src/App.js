@@ -11,17 +11,22 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import CodeReviewerDashboard from "./CodeReviewerDashboard";
 import jwt_decode from "jwt-decode";
 import CodeReviewAssignmentView from "./CodeReviewAssignmentView";
+import {UserProvider, useUser} from "./UserProvider";
 
 function App() {
-    const [jwt, setJwt] = useLocalState("", "jwt");
-    const [roles, setRoles] = useState(getRoleFromJwt());
+    const [roles, setRoles] = useState([]);
+    const user = useUser();
 
-    function getRoleFromJwt() {
-        if (jwt) {
-            const decodedJwt = jwt_decode(jwt);
+    useEffect(() => {
+        setRoles(getRolesFromJwt());
+    }, [user.jwt]);
+
+    function getRolesFromJwt() {
+        if (user.jwt) {
+            const decodedJwt = jwt_decode(user.jwt);
             return decodedJwt.authorities;
         }
-        return []
+        return [];
     }
 
     return (
@@ -35,7 +40,7 @@ function App() {
             />
 
 
-            <Route path="/assignments/:id" element={
+            <Route path="/assignments/:assignmentId" element={
                 roles.find((role) => role === "ROLE_INSTRUCTOR") ? (
                     <PrivateRoute><CodeReviewAssignmentView/></PrivateRoute>
                 ) : (
@@ -45,6 +50,7 @@ function App() {
             <Route path="/login" element={<Login/>}/>
             <Route path="/" element={<Homepage/>}/>
         </Routes>
+
     );
 }
 

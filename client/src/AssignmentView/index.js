@@ -11,10 +11,14 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import StatusBadge from "../StatusBadge";
+import {useNavigate, useParams} from "react-router-dom";
+import {useUser} from "../UserProvider";
 
 const AssignmentView = () => {
-    const [jwt, setJwt] = useLocalState("", "jwt")
-    const assignmentId = window.location.href.split("/assignments/")[1];
+    let navigate = useNavigate();
+    const user = useUser();
+    const {assignmentId} = useParams();
+    // const assignmentId = window.location.href.split("/assignments/")[1];
     const [assignment, setAssignment] = useState({
         branch: "",
         githubUrl: "",
@@ -23,9 +27,37 @@ const AssignmentView = () => {
     });
     const [assignmentEnums, setAssignmentEnums] = useState([]);
     const [assignmentStatuses, setAssignmentStatuses] = useState([]);
+    const [comment, setComment] = useState({
+        text: "",
+        assignmentId: assignmentId != null ? parseInt(assignmentId) : null,
+        user: user.jwt
+    });
+    const [comments, setComments] = useState([]);
 
     const prevAssignmentValue = useRef(assignment);
-    console.log(prevAssignmentValue);
+
+    function submitComment() {
+        ajax('/api/comments', 'post', user.jwt, comment).then(commentData => {
+            const commentsCopy = [...comments];
+            commentsCopy.push(commentData);
+
+            setComments(commentsCopy);
+        })
+    }
+
+    useEffect(() => {
+        ajax(`/api/comments?assignmentId=${assignmentId}`, "GET", user.jwt, null).then(
+            (commentsData) => {
+                setComments(commentsData)
+            }
+        );
+    }, [])
+
+    function updateComment(value) {
+        const commentCopy = {...comment};
+        commentCopy.text = value;
+        setComment(commentCopy);
+    }
 
     function updateAssignment(prop, value) {
         const newAssignment = {...assignment};
@@ -33,15 +65,16 @@ const AssignmentView = () => {
         setAssignment(newAssignment);
     }
 
-    function save() {
-        if (assignment.status === assignmentStatuses[0].status) {
-            updateAssignment("status", assignmentStatuses[1].status)
+    function save(status) {
+        if (status && assignment.status !== status) {
+            updateAssignment("status", status)
+        } else {
+            persist()
         }
-        persist()
     }
 
     function persist() {
-        ajax(`/api/assignments/${assignmentId}`, "PUT", jwt, assignment).then(
+        ajax(`/api/assignments/${assignmentId}`, "PUT", user.jwt, assignment).then(
             assignmentData => {
                 setAssignment(assignmentData);
             })
@@ -56,7 +89,7 @@ const AssignmentView = () => {
 
 
     useEffect(() => {
-        ajax(`/api/assignments/${assignmentId}`, "GET", jwt).then(assignmentResponse => {
+        ajax(`/api/assignments/${assignmentId}`, "GET", user.jwt).then(assignmentResponse => {
             let assignmentData = assignmentResponse.assignment;
             if (assignmentData.branch === null)
                 assignmentData.branch = "";
@@ -65,7 +98,6 @@ const AssignmentView = () => {
             setAssignment(assignmentData)
             setAssignmentEnums(assignmentResponse.assignmentEnums);
             setAssignmentStatuses(assignmentResponse.statusEnums);
-            console.log(assignmentResponse.statusEnums);
         });
     }, []);
 
@@ -144,20 +176,40 @@ const AssignmentView = () => {
                             </Col>
                         </Form.Group>
                         <div className="d-flex gap-5">
-                            <Button size="lg" variant="secondary" onClick={() => window.location.href = "/dashboard"}>
+                            <Button size="lg" variant="secondary" onClick={() => navigate("/dashboard")}>
                                 Back</Button>
                         </div>
                     </>
-                ) : (
+                ) : assignment.status === "Pending Submission" ? (
                     <div className="d-flex gap-5">
-                        <Button size="lg" variant="outline-success" onClick={() => save()}>Submit
+                        <Button size="lg" variant="outline-success" onClick={() => save("Submitted")}>Submit
                             Assignment</Button>
-                        <Button size="lg" variant="secondary" onClick={() => window.location.href = "/dashboard"}>
+                        <Button size="lg" variant="secondary" onClick={() => navigate("/dashboard")}>
                             Back</Button>
                     </div>
 
-                )}
-
+                ) : (<div className="d-flex gap-5">
+                    <Button size="lg" variant="outline-success" onClick={() => save("Resubmitted")}>Re-Submit
+                        Assignment</Button>
+                    <Button size="lg" variant="secondary" onClick={() => navigate("/dashboard")}>
+                        Back</Button>
+                </div>)
+                }
+                <div className="mt-5">
+                    <textarea
+                        style={{width: "100%", borderRadius: "0.25em"}}
+                        onChange={(e) => updateComment(e.target.value)}>
+                    </textarea>
+                    <Button onClick={() => submitComment()}>Post Comment</Button>
+                </div>
+                <div className="mt-5">
+                    {comments.map((comment) => (
+                        <div>
+                    <span style={{fontWeight: "bold"}}>
+           {`[${comment.createdDate}] ${comment.createdBy.name}: `}
+                    </span> {comment.text}
+                        </div>))}
+                </div>
 
             </>) : (<></>)}
 

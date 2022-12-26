@@ -5,21 +5,24 @@ import {Badge, Button, Card} from "react-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import StatusBadge from "../StatusBadge";
+import {useNavigate} from "react-router-dom";
+import {useUser} from "../UserProvider";
 
 
 const Dashboard = () => {
-    const [jwt, setJwt] = useLocalState("", "jwt");
+    const navigate = useNavigate();
+    const user = useUser();
     const [assignments, setAssignments] = useState(null);
 
     useEffect(() => {
-        ajax("api/assignments", "GET", jwt).then(assignmentsData => {
+        ajax("api/assignments", "GET", user.jwt).then(assignmentsData => {
             setAssignments(assignmentsData);
         })
-    }, [jwt]);
+    }, [user.jwt]);
 
 
     function createAssignment() {
-        ajax("api/assignments", "POST", jwt).then(assignment => {
+        ajax("api/assignments", "POST", user.jwt).then(assignment => {
             window.location.href = `/assignments/${assignment.id}`;
         });
     }
@@ -32,8 +35,8 @@ const Dashboard = () => {
                         className="d-flex justify-content-end"
                         style={{cursor: "pointer"}}
                         onClick={() => {
-                            setJwt(null);
-                            window.location.href = "/login";
+                            user.setJwt(null);
+                            navigate("/login");
                         }}>
                         Logout
                     </div>

@@ -1,16 +1,22 @@
-import React, {useState} from 'react';
-import {useLocalState} from "../util/useLocalStorage";
+import React, {useEffect, useState} from 'react';
 
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import {Button, Form} from "react-bootstrap";
+import {useNavigate} from "react-router-dom";
+import {useUser} from "../UserProvider";
 
 const Login = () => {
+    const user = useUser();
+    const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const [jwt, setJwt] = useLocalState("", "jwt");
+    useEffect(() => {
+        if (user.jwt) navigate("/dashboard");
+    }, [user]);
+
 
     function sendLoginRequest() {
         const reqBody = {
@@ -29,8 +35,7 @@ const Login = () => {
                 return Promise.reject("Invalid Login Attempt");
         })
             .then(([body, headers]) => {
-                setJwt(headers.get("authorization"));
-                window.location.href = "dashboard";
+                user.setJwt(headers.get("authorization"));
             }).catch((message) => {
             alert(message);
         });
@@ -66,7 +71,7 @@ const Login = () => {
                         <Button id="submit" type="button" size="lg" onClick={() => sendLoginRequest()}>Login</Button>
                         <Button variant="secondary" type="button" size="lg"
                                 onClick={() => {
-                                    window.location.href = "/";
+                                    navigate("/");
                                 }}>Exit</Button>
                     </Col>
                 </Row>
